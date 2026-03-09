@@ -63,21 +63,47 @@ grep "^val_bpb:" run.log
 
 ## Logging results
 
-When an experiment is done, log it to `results.tsv` (tab-separated, NOT comma-separated — commas break in descriptions).
+**Use `log_experiment.py` for ALL experiment logging.** It handles everything atomically — ledger, memory, and results.tsv in one command. Never manually edit these files.
 
-The TSV has a header row and 5 columns:
+After each experiment, run:
 
+```bash
+# Successful experiment (KEEP or DISCARD):
+python log_experiment.py \
+    --tag architecture \
+    --hypothesis "increasing n_layer from 8 to 12 will lower val_bpb" \
+    --mechanism "deeper network captures longer-range dependencies" \
+    --confidence medium \
+    --val-bpb-before 0.9979 \
+    --val-bpb-after 0.9951 \
+    --peak-vram-mb 45060.2 \
+    --verdict KEEP \
+    --reason "meaningful improvement of -0.0028" \
+    --followup-win "try n_layer=16" \
+    --followup-loss "try wider instead"
+
+# Crashed experiment:
+python log_experiment.py \
+    --tag architecture \
+    --hypothesis "double model width" \
+    --mechanism "more parameters" \
+    --confidence low \
+    --val-bpb-before 0.9979 \
+    --crashed \
+    --crash-snippet "RuntimeError: CUDA out of memory" \
+    --verdict DISCARD \
+    --reason "OOM crash"
 ```
-commit	val_bpb	memory_gb	status	description
-```
 
-1. git commit hash (short, 7 chars)
-2. val_bpb achieved (e.g. 1.234567) — use 0.000000 for crashes
-3. peak memory in GB, round to .1f (e.g. 12.3 — divide peak_vram_mb by 1024) — use 0.0 for crashes
-4. status: `keep`, `discard`, or `crash`
-5. short text description of what this experiment tried
+Verdict options: `KEEP`, `DISCARD`, `CONFIRM_PASS`, `CONFIRM_FAIL`
 
-Example:
+The script automatically:
+- Appends a full JSON record to `experiment_ledger.jsonl`
+- Updates per-tag stats in `intervention_memory.json`
+- Appends a row to `results.tsv`
+- Reads the current git branch and commit
+
+You can also view `results.tsv` directly. It has 5 columns:
 
 ```
 commit	val_bpb	memory_gb	status	description
@@ -87,21 +113,27 @@ c3d4e5f	1.005000	44.0	discard	switch to GeLU activation
 d4e5f6g	0.000000	0.0	crash	double model width (OOM)
 ```
 
+To see a full experiment summary at any time: `python report.py`
+
 ## The experiment loop
 
 The experiment runs on a dedicated branch (e.g. `autoresearch/mar5` or `autoresearch/mar5-gpu0`).
 
 LOOP FOREVER:
 
-1. Look at the git state: the current branch/commit we're on
-2. Tune `train.py` with an experimental idea by directly hacking the code.
-3. git commit
-4. Run the experiment: `uv run train.py > run.log 2>&1` (redirect everything — do NOT use tee or let output flood your context)
-5. Read out the results: `grep "^val_bpb:\|^peak_vram_mb:" run.log`
-6. If the grep output is empty, the run crashed. Run `tail -n 50 run.log` to read the Python stack trace and attempt a fix. If you can't get things to work after more than a few attempts, give up.
-7. Record the results in the tsv
-8. If val_bpb improved (lower), you "advance" the branch, keeping the git commit
-9. If val_bpb is equal or worse, you git reset back to where you started
+1. **Read context**: Read `experiment_ledger.jsonl` (last 10 entries) and `intervention_memory.json` to see what's been tried and what works.
+2. **Write hypothesis**: Write a hypothesis block (see Scientist Layer section below) BEFORE touching any code.
+3. **Edit train.py**: Make the code change.
+4. **git commit**: `git add train.py && git commit -m "<short description>"`
+5. **Run**: `uv run train.py > run.log 2>&1` (redirect everything — do NOT use tee or let output flood your context)
+6. **Read results**: `grep "^val_bpb:\|^peak_vram_mb:" run.log`
+7. **Handle crashes**: If grep output is empty, the run crashed. Run `tail -n 50 run.log` to read the stack trace. If it's a dumb bug, fix and rerun. If fundamentally broken, give up on this idea.
+8. **Judge**: Apply the verdict rules (see Scientist Layer section below). Decide KEEP, DISCARD, or CONFIRM (rerun borderline wins once).
+9. **Log**: Run `python log_experiment.py` with the appropriate arguments. This handles ledger, memory, AND results.tsv atomically.
+10. **Act on verdict**:
+    - KEEP → branch advances, the git commit stays
+    - DISCARD → `git reset --hard <parent_commit>` to revert train.py
+    - CONFIRM → rerun step 5, then decide KEEP or DISCARD
 
 The idea is that you are a completely autonomous researcher trying things out. If they work, keep. If they don't, discard. And you're advancing the branch so that you can iterate. If you feel like you're getting stuck in some way, you can rewind but you should probably do this very very sparingly (if ever).
 

@@ -82,32 +82,32 @@ def print_report():
         print(f"  Best improvement:   {BASELINE_VAL_BPB - best_bpb:.6f}")
         print(f"  Best hypothesis:    {best_entry.get('hypothesis', 'N/A')[:80]}")
 
-    print(f"\n{'─' * 70}")
+    print(f"\n{'-' * 70}")
     print("  TOP 3 MOST PRODUCTIVE INTERVENTION TAGS")
-    print(f"{'─' * 70}")
+    print(f"{'-' * 70}")
     print(f"  {'Tag':<20} {'Tried':>6} {'Improved':>9} {'Rate':>6} {'Avg Delta':>10}")
-    print(f"  {'─'*20} {'─'*6} {'─'*9} {'─'*6} {'─'*10}")
+    print(f"  {'-'*20} {'-'*6} {'-'*9} {'-'*6} {'-'*10}")
     for tag, stats in sorted_by_success[:3]:
         rate = stats["improved"] / max(stats["tried"], 1)
         avg_d = stats["total_delta"] / max(stats["tried"], 1)
         print(f"  {tag:<20} {stats['tried']:>6} {stats['improved']:>9} {rate:>5.0%} {avg_d:>+10.6f}")
 
-    print(f"\n{'─' * 70}")
+    print(f"\n{'-' * 70}")
     print("  TOP 3 MOST FAILED / CRASH-PRONE TAGS")
-    print(f"{'─' * 70}")
+    print(f"{'-' * 70}")
     print(f"  {'Tag':<20} {'Tried':>6} {'Crashed':>8} {'Crash%':>7} {'Improved':>9}")
-    print(f"  {'─'*20} {'─'*6} {'─'*8} {'─'*7} {'─'*9}")
+    print(f"  {'-'*20} {'-'*6} {'-'*8} {'-'*7} {'-'*9}")
     for tag, stats in sorted_by_crash[:3]:
         crash_rate = stats["crashed"] / max(stats["tried"], 1)
         warn = " *** HIGH" if crash_rate > 0.30 else ""
         print(f"  {tag:<20} {stats['tried']:>6} {stats['crashed']:>8} {crash_rate:>6.0%} {stats['improved']:>9}{warn}")
 
     # Recent experiments
-    print(f"\n{'─' * 70}")
+    print(f"\n{'-' * 70}")
     print("  LAST 10 EXPERIMENTS")
-    print(f"{'─' * 70}")
+    print(f"{'-' * 70}")
     print(f"  {'#':>3} {'Verdict':<13} {'Delta':>10} {'Tag':<18} {'Hypothesis':<30}")
-    print(f"  {'─'*3} {'─'*13} {'─'*10} {'─'*18} {'─'*30}")
+    print(f"  {'-'*3} {'-'*13} {'-'*10} {'-'*18} {'-'*30}")
     for i, e in enumerate(ledger[-10:], start=max(1, total - 9)):
         verdict = e.get("verdict", "?")
         delta = e.get("delta", 0.0)
