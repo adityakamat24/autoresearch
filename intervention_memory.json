@@ -1,0 +1,83 @@
+{
+  "architecture": {
+    "n_tried": 0,
+    "n_improved": 0,
+    "n_confirmed": 0,
+    "n_crashed": 0,
+    "avg_delta": 0.0,
+    "best_delta": 0.0,
+    "avg_vram_change_pct": 0.0
+  },
+  "optimizer": {
+    "n_tried": 0,
+    "n_improved": 0,
+    "n_confirmed": 0,
+    "n_crashed": 0,
+    "avg_delta": 0.0,
+    "best_delta": 0.0,
+    "avg_vram_change_pct": 0.0
+  },
+  "schedule": {
+    "n_tried": 0,
+    "n_improved": 0,
+    "n_confirmed": 0,
+    "n_crashed": 0,
+    "avg_delta": 0.0,
+    "best_delta": 0.0,
+    "avg_vram_change_pct": 0.0
+  },
+  "batching": {
+    "n_tried": 0,
+    "n_improved": 0,
+    "n_confirmed": 0,
+    "n_crashed": 0,
+    "avg_delta": 0.0,
+    "best_delta": 0.0,
+    "avg_vram_change_pct": 0.0
+  },
+  "attention": {
+    "n_tried": 0,
+    "n_improved": 0,
+    "n_confirmed": 0,
+    "n_crashed": 0,
+    "avg_delta": 0.0,
+    "best_delta": 0.0,
+    "avg_vram_change_pct": 0.0
+  },
+  "initialization": {
+    "n_tried": 0,
+    "n_improved": 0,
+    "n_confirmed": 0,
+    "n_crashed": 0,
+    "avg_delta": 0.0,
+    "best_delta": 0.0,
+    "avg_vram_change_pct": 0.0
+  },
+  "numerical": {
+    "n_tried": 0,
+    "n_improved": 0,
+    "n_confirmed": 0,
+    "n_crashed": 0,
+    "avg_delta": 0.0,
+    "best_delta": 0.0,
+    "avg_vram_change_pct": 0.0
+  },
+  "seed_only": {
+    "n_tried": 0,
+    "n_improved": 0,
+    "n_confirmed": 0,
+    "n_crashed": 0,
+    "avg_delta": 0.0,
+    "best_delta": 0.0,
+    "avg_vram_change_pct": 0.0
+  },
+  "other": {
+    "n_tried": 0,
+    "n_improved": 0,
+    "n_confirmed": 0,
+    "n_crashed": 0,
+    "avg_delta": 0.0,
+    "best_delta": 0.0,
+    "avg_vram_change_pct": 0.0
+  }
+}
